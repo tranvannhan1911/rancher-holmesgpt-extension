@@ -104,17 +104,43 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import MarkdownIt from 'markdown-it';
 
-const route = useRoute();
-const clusterId = route.params.cluster;
+// Safe route parameter extraction
+let routeParams = {};
+try {
+  // Try to use Vue Router if available
+  const { useRoute } = await import('vue-router');
+  const route = useRoute();
+  routeParams = route.params;
+} catch (error) {
+  // Fallback: Extract from URL if router is not available
+  console.log('Vue Router not available, extracting from URL');
+  if (typeof window !== 'undefined') {
+    const pathSegments = window.location.pathname.split('/');
+    // Assuming URL structure like /cluster/:cluster/resource/:resource/id/:id
+    const clusterIndex = pathSegments.indexOf('cluster');
+    const resourceIndex = pathSegments.indexOf('resource');
+    const idIndex = pathSegments.indexOf('id');
+    const namespaceIndex = pathSegments.indexOf('namespace');
+    const productIndex = pathSegments.indexOf('product');
 
-const resourceType = route.params.resource || 'pod';
-const resourceId = route.params.id;
-const namespace = route.params.namespace || 'default';
-const cluster = route.params.cluster || 'local';
-const product = route.params.product || '';
+    routeParams = {
+      cluster: clusterIndex !== -1 ? pathSegments[clusterIndex + 1] : null,
+      resource: resourceIndex !== -1 ? pathSegments[resourceIndex + 1] : null,
+      id: idIndex !== -1 ? pathSegments[idIndex + 1] : null,
+      namespace: namespaceIndex !== -1 ? pathSegments[namespaceIndex + 1] : null,
+      product: productIndex !== -1 ? pathSegments[productIndex + 1] : null
+    };
+  }
+}
+
+// Route parameters with fallback values
+const clusterId = routeParams.cluster || 'local';
+const resourceType = routeParams.resource || 'pod';
+const resourceId = routeParams.id || 'my-deployment';
+const namespace = routeParams.namespace || 'default';
+const cluster = routeParams.cluster || 'local';
+const product = routeParams.product || '';
 
 const input = ref('');
 const messages = ref([]);
@@ -131,20 +157,33 @@ const defaultHint = ref('Check workload health');
 const dynamicHints = ref([]);
 const showDefaultHint = ref(true);
 
-// Initialize markdown-it
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  breaks: true
-});
+// Markdown renderer with fallback
+function renderMarkdown(text) {
+  try {
+    // Try to use MarkdownIt if available
+    if (typeof MarkdownIt !== 'undefined') {
+      const md = new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true,
+        breaks: true
+      });
+      return md.render(text);
+    }
+  } catch (error) {
+    console.log('MarkdownIt not available, using simple markdown');
+  }
+
+  // Simple fallback markdown rendering
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
 
 function formatTime(date) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function renderMarkdown(text) {
-  return md.render(text);
 }
 
 function adjustTextareaHeight() {
@@ -204,7 +243,7 @@ async function sendMessage() {
     const body = {
       ask: messageText,
       resource: {
-        name: resourceId || 'my-deployment',
+        name: resourceId,
         kind: resourceType.charAt(0).toUpperCase() + resourceType.slice(1),
         namespace: namespace,
         cluster: cluster

@@ -80,11 +80,24 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import MarkdownIt from 'markdown-it';
 
-const route = useRoute();
-const clusterId = route.params.cluster;
+// Remove problematic router code and make clusterId optional
+const clusterId = ref(null);
+
+// Try to get clusterId from router if available
+try {
+  // Only import and use router if it's available
+  if (typeof window !== 'undefined' && window.location) {
+    // Extract from URL path if needed
+    const pathSegments = window.location.pathname.split('/');
+    const clusterIndex = pathSegments.indexOf('cluster');
+    if (clusterIndex !== -1 && pathSegments[clusterIndex + 1]) {
+      clusterId.value = pathSegments[clusterIndex + 1];
+    }
+  }
+} catch (error) {
+  console.log('Router not available, using default configuration');
+}
 
 const input = ref('');
 const messages = ref([]);
@@ -96,20 +109,33 @@ const textareaRef = ref(null);
 
 const API_URL = 'https://holmes.192.223.13.246.sslip.io/api/chat';
 
-// Initialize markdown-it
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  breaks: true
-});
+// Simple markdown renderer (fallback if MarkdownIt is not available)
+function renderMarkdown(text) {
+  try {
+    // Try to use MarkdownIt if available
+    if (typeof MarkdownIt !== 'undefined') {
+      const md = new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true,
+        breaks: true
+      });
+      return md.render(text);
+    }
+  } catch (error) {
+    console.log('MarkdownIt not available, using simple markdown');
+  }
+
+  // Simple fallback markdown rendering
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
 
 function formatTime(date) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function renderMarkdown(text) {
-  return md.render(text);
 }
 
 function adjustTextareaHeight() {

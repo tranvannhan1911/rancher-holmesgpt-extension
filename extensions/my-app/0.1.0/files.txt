@@ -1,0 +1,12 @@
+plugin/img/harvester.20240f8a.png
+plugin/my-app-0.1.0.umd.min.216.js
+plugin/my-app-0.1.0.umd.min.216.js.map
+plugin/my-app-0.1.0.umd.min.37.js
+plugin/my-app-0.1.0.umd.min.37.js.map
+plugin/my-app-0.1.0.umd.min.436.js
+plugin/my-app-0.1.0.umd.min.436.js.map
+plugin/my-app-0.1.0.umd.min.60.js
+plugin/my-app-0.1.0.umd.min.60.js.map
+plugin/my-app-0.1.0.umd.min.js
+plugin/my-app-0.1.0.umd.min.js.map
+plugin/package.json

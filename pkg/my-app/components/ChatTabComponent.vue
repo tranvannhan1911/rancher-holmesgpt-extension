@@ -105,33 +105,32 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
 
-// Safe route parameter extraction
 let routeParams = {};
+let useRoute;
 try {
-  // Try to use Vue Router if available
-  const { useRoute } = await import('vue-router');
-  const route = useRoute();
-  routeParams = route.params;
+  useRoute = require('vue-router').useRoute;
 } catch (error) {
-  // Fallback: Extract from URL if router is not available
-  console.log('Vue Router not available, extracting from URL');
-  if (typeof window !== 'undefined') {
-    const pathSegments = window.location.pathname.split('/');
-    // Assuming URL structure like /cluster/:cluster/resource/:resource/id/:id
-    const clusterIndex = pathSegments.indexOf('cluster');
-    const resourceIndex = pathSegments.indexOf('resource');
-    const idIndex = pathSegments.indexOf('id');
-    const namespaceIndex = pathSegments.indexOf('namespace');
-    const productIndex = pathSegments.indexOf('product');
+  useRoute = null;
+}
 
-    routeParams = {
-      cluster: clusterIndex !== -1 ? pathSegments[clusterIndex + 1] : null,
-      resource: resourceIndex !== -1 ? pathSegments[resourceIndex + 1] : null,
-      id: idIndex !== -1 ? pathSegments[idIndex + 1] : null,
-      namespace: namespaceIndex !== -1 ? pathSegments[namespaceIndex + 1] : null,
-      product: productIndex !== -1 ? pathSegments[productIndex + 1] : null
-    };
-  }
+if (useRoute) {
+  const route = useRoute();
+  routeParams = route?.params || {};
+} else if (typeof window !== 'undefined') {
+  const pathSegments = window.location.pathname.split('/');
+  const clusterIndex = pathSegments.indexOf('cluster');
+  const resourceIndex = pathSegments.indexOf('resource');
+  const idIndex = pathSegments.indexOf('id');
+  const namespaceIndex = pathSegments.indexOf('namespace');
+  const productIndex = pathSegments.indexOf('product');
+
+  routeParams = {
+    cluster: clusterIndex !== -1 ? pathSegments[clusterIndex + 1] : null,
+    resource: resourceIndex !== -1 ? pathSegments[resourceIndex + 1] : null,
+    id: idIndex !== -1 ? pathSegments[idIndex + 1] : null,
+    namespace: namespaceIndex !== -1 ? pathSegments[namespaceIndex + 1] : null,
+    product: productIndex !== -1 ? pathSegments[productIndex + 1] : null
+  };
 }
 
 // Route parameters with fallback values

@@ -22,11 +22,12 @@ import MarkdownIt from 'markdown-it';
 
 const route = useRoute();
 
-const resourceType = route.params.resource || 'pod';
-const resourceId = route.params.id;
-const namespace = route.params.namespace || 'default';
-const cluster = route.params.cluster || 'local';
-const product = route.params.product || '';
+// Defensive checks for route.params
+const resourceType = route?.params?.resource || 'pod';
+const resourceId = route?.params?.id;
+const namespace = route?.params?.namespace || 'default';
+const cluster = route?.params?.cluster || 'local';
+const product = route?.params?.product || '';
 
 const API_URL = 'https://holmes.192.223.13.246.sslip.io/api/investigate';
 

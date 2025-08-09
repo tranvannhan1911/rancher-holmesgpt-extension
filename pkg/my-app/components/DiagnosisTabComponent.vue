@@ -38,8 +38,8 @@ function extractResourceFromPath(path) {
 
 // Try to get resource info from params, query, or path
 let resourceType = route?.params?.resource || route?.query?.resource;
-let resourceId = route?.params?.id || route?.query?.id;
-let namespace = route?.params?.namespace || route?.query?.namespace || 'default';
+let resourceId = route?.params?.id || route?.query?.id || 'auth-service';
+let namespace = route?.params?.namespace || route?.query?.namespace || 'test-1';
 let cluster = route?.params?.cluster || route?.query?.cluster || 'local';
 let product = route?.params?.product || route?.query?.product || '';
 
@@ -81,6 +81,7 @@ async function fetchDiagnosis() {
       namespace,
       product,
       resource: resourceType,
+      name: resourceId,
       [resourceType]: resourceId, // e.g. pod: "error-pod", deployment: "my-deploy"
     };
     console.log('Diagnosis subject:', subject); // Debug log

@@ -129,8 +129,8 @@ if (!routeParams.resource || !routeParams.id || !routeParams.cluster) {
 // Route parameters with fallback values
 const clusterId = routeParams.cluster || 'local';
 const resourceType = routeParams.resource || 'pod';
-const resourceId = routeParams.id || 'my-deployment';
-const namespace = routeParams.namespace || 'default';
+const resourceId = routeParams.id || 'resource';
+const namespace = routeParams.namespace || 'test-1';
 const cluster = routeParams.cluster || 'local';
 const product = routeParams.product || '';
 

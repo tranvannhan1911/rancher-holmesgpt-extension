@@ -43,8 +43,16 @@ let namespace = route?.params?.namespace || route?.query?.namespace || 'default'
 let cluster = route?.params?.cluster || route?.query?.cluster || 'local';
 let product = route?.params?.product || route?.query?.product || '';
 
+// Defensive check for route.path
+let routePath = '';
+if (route && route.path) {
+  routePath = route.path;
+} else if (typeof window !== 'undefined') {
+  routePath = window.location.pathname;
+}
+
 if (!resourceType || !resourceId) {
-  const extracted = extractResourceFromPath(route.path);
+  const extracted = extractResourceFromPath(routePath);
   resourceType = resourceType || extracted.resourceType || 'pod';
   resourceId = resourceId || extracted.resourceId;
 }

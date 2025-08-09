@@ -108,9 +108,17 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 let routeParams = route?.params || {};
+
+// Defensive check for route.path
+let routePath = '';
+if (route && route.path) {
+  routePath = route.path;
+} else if (typeof window !== 'undefined') {
+  routePath = window.location.pathname;
+}
 // Fallback to path parsing if missing
 if (!routeParams.resource || !routeParams.id || !routeParams.cluster) {
-  const match = route.path.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\//);
+  const match = routePath.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\//);
   if (match) {
     routeParams.cluster = match[1];
     routeParams.resource = match[2];

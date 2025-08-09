@@ -15,7 +15,7 @@
     </div>
 
     <!-- Hints Section -->
-    <div class="hints-section" v-if="showDefaultHint || dynamicHints.length > 0">
+    <div class="hints-section" v-if="showDefaultHint || dynamicHints?.length > 0">
       <div class="hints-container">
         <div class="hints-label">Quick Actions:</div>
         <div class="hints-list">
@@ -40,7 +40,7 @@
 
     <div class="messages-container" ref="messagesContainer">
       <div class="messages-list">
-        <div v-if="messages.length === 0" class="welcome-message">
+        <div v-if="messages?.length === 0" class="welcome-message">
           <div class="welcome-content">
             <div class="welcome-icon">🔍</div>
             <h3>Workload Health Assistant</h3>
@@ -104,33 +104,18 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
-let routeParams = {};
-let useRoute;
-try {
-  useRoute = require('vue-router').useRoute;
-} catch (error) {
-  useRoute = null;
-}
-
-if (useRoute) {
-  const route = useRoute();
-  routeParams = route?.params || {};
-} else if (typeof window !== 'undefined') {
-  const pathSegments = window.location.pathname.split('/');
-  const clusterIndex = pathSegments.indexOf('cluster');
-  const resourceIndex = pathSegments.indexOf('resource');
-  const idIndex = pathSegments.indexOf('id');
-  const namespaceIndex = pathSegments.indexOf('namespace');
-  const productIndex = pathSegments.indexOf('product');
-
-  routeParams = {
-    cluster: clusterIndex !== -1 ? pathSegments[clusterIndex + 1] : null,
-    resource: resourceIndex !== -1 ? pathSegments[resourceIndex + 1] : null,
-    id: idIndex !== -1 ? pathSegments[idIndex + 1] : null,
-    namespace: namespaceIndex !== -1 ? pathSegments[namespaceIndex + 1] : null,
-    product: productIndex !== -1 ? pathSegments[productIndex + 1] : null
-  };
+const route = useRoute();
+let routeParams = route?.params || {};
+// Fallback to path parsing if missing
+if (!routeParams.resource || !routeParams.id || !routeParams.cluster) {
+  const match = route.path.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\//);
+  if (match) {
+    routeParams.cluster = match[1];
+    routeParams.resource = match[2];
+    routeParams.id = match[3];
+  }
 }
 
 // Route parameters with fallback values
@@ -153,7 +138,7 @@ const textareaRef = ref(null);
 const API_URL = 'https://holmes.192.223.13.246.sslip.io/api/workload_health_chat';
 
 const defaultHint = ref('Check workload health');
-const dynamicHints = ref([]);
+const dynamicHints = ref([]); // Ensure this is always an array
 const showDefaultHint = ref(true);
 
 // Markdown renderer with fallback

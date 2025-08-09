@@ -22,12 +22,32 @@ import MarkdownIt from 'markdown-it';
 
 const route = useRoute();
 
-// Defensive checks for route.params
-const resourceType = route?.params?.resource || 'pod';
-const resourceId = route?.params?.id;
-const namespace = route?.params?.namespace || 'default';
-const cluster = route?.params?.cluster || 'local';
-const product = route?.params?.product || '';
+// Helper to extract resource info from path if not in params/query
+function extractResourceFromPath(path) {
+  // Example path: /dashboard/c/local/explorer/apps.deployment/test-1/notification#diagnosis-tab
+  // Extract resourceType: apps.deployment, resourceId: test-1
+  const match = path.match(/explorer\/(.*?)\/(.*?)\//);
+  if (match) {
+    return {
+      resourceType: match[1],
+      resourceId: match[2]
+    };
+  }
+  return {};
+}
+
+// Try to get resource info from params, query, or path
+let resourceType = route?.params?.resource || route?.query?.resource;
+let resourceId = route?.params?.id || route?.query?.id;
+let namespace = route?.params?.namespace || route?.query?.namespace || 'default';
+let cluster = route?.params?.cluster || route?.query?.cluster || 'local';
+let product = route?.params?.product || route?.query?.product || '';
+
+if (!resourceType || !resourceId) {
+  const extracted = extractResourceFromPath(route.path);
+  resourceType = resourceType || extracted.resourceType || 'pod';
+  resourceId = resourceId || extracted.resourceId;
+}
 
 const API_URL = 'https://holmes.192.223.13.246.sslip.io/api/investigate';
 
@@ -55,6 +75,7 @@ async function fetchDiagnosis() {
       resource: resourceType,
       [resourceType]: resourceId, // e.g. pod: "error-pod", deployment: "my-deploy"
     };
+    console.log('Diagnosis subject:', subject); // Debug log
 
     const res = await fetch(API_URL, {
       method: 'POST',

@@ -1,0 +1,2 @@
+(("undefined"!==typeof self?self:this)["webpackChunkmy_app_0_1_8"]=("undefined"!==typeof self?self:this)["webpackChunkmy_app_0_1_8"]||[]).push([[37],{49037:function(e){const t=[{"my-app":{"tab-troubleshooting":"Troubleshooting","tab-diagnosis":"AI Diagnosis","tab-chat":"AI Chat"}}];e.exports=t.length<=1?t[0]:t}}]);
+//# sourceMappingURL=my-app-0.1.8.umd.min.37.js.map

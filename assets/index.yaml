@@ -11,6 +11,25 @@ entries:
       catalog.cattle.io/ui-component: plugins
       catalog.cattle.io/ui-extensions-version: '>= 3.0.0 < 4.0.0'
     apiVersion: v2
+    appVersion: 0.1.5
+    created: "2025-08-09T02:07:44.608488488Z"
+    description: my-app plugin
+    digest: c08ac4d71063b9ff5d616c8b915ea1c5629367587f190b2ed177a8913fd0abbf
+    name: my-app
+    type: application
+    urls:
+    - assets/my-app/my-app-0.1.5.tgz
+    version: 0.1.5
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= 2.10.0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
+      catalog.cattle.io/ui-extensions-version: '>= 3.0.0 < 4.0.0'
+    apiVersion: v2
     appVersion: 0.1.4
     created: "2025-08-08T19:27:38.630477907Z"
     description: my-app plugin
@@ -58,4 +77,4 @@ entries:
     urls:
     - assets/my-app/my-app-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-08T19:27:38.630146646Z"
+generated: "2025-08-09T02:07:44.608130522Z"

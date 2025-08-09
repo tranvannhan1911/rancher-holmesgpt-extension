@@ -24,13 +24,15 @@ const route = useRoute();
 
 // Helper to extract resource info from path if not in params/query
 function extractResourceFromPath(path) {
-  // Example path: /dashboard/c/local/explorer/apps.deployment/test-1/notification#diagnosis-tab
-  // Extract resourceType: apps.deployment, resourceId: test-1
-  const match = path.match(/explorer\/(.*?)\/(.*?)\//);
+  // Example path: /dashboard/c/local/explorer/apps.deployment/test-1/frontend#diagnosis-tab
+  // Extract cluster, resourceType, namespace, resourceId
+  const match = path.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\/(.*?)(?:\/|$)/);
   if (match) {
     return {
-      resourceType: match[1],
-      resourceId: match[2]
+      cluster: match[1],
+      resourceType: match[2],
+      namespace: match[3],
+      resourceId: match[4]
     };
   }
   return {};
@@ -38,9 +40,9 @@ function extractResourceFromPath(path) {
 
 // Try to get resource info from params, query, or path
 let resourceType = route?.params?.resource || route?.query?.resource;
-let resourceId = route?.params?.id || route?.query?.id || 'auth-service';
-let namespace = route?.params?.namespace || route?.query?.namespace || 'test-1';
-let cluster = route?.params?.cluster || route?.query?.cluster || 'local';
+let resourceId = route?.params?.id || route?.query?.id;
+let namespace = route?.params?.namespace || route?.query?.namespace;
+let cluster = route?.params?.cluster || route?.query?.cluster;
 let product = route?.params?.product || route?.query?.product || '';
 
 // Defensive check for route.path
@@ -51,10 +53,12 @@ if (route && route.path) {
   routePath = window.location.pathname;
 }
 
-if (!resourceType || !resourceId) {
+if (!resourceType || !resourceId || !namespace || !cluster) {
   const extracted = extractResourceFromPath(routePath);
   resourceType = resourceType || extracted.resourceType || 'pod';
-  resourceId = resourceId || extracted.resourceId;
+  resourceId = resourceId || extracted.resourceId || 'resource';
+  namespace = namespace || extracted.namespace || 'test-1';
+  cluster = cluster || extracted.cluster || 'local';
 }
 
 const API_URL = 'https://holmes.192.223.13.246.sslip.io/api/investigate';

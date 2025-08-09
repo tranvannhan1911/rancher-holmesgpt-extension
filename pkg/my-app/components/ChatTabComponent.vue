@@ -117,12 +117,14 @@ if (route && route.path) {
   routePath = window.location.pathname;
 }
 // Fallback to path parsing if missing
-if (!routeParams.resource || !routeParams.id || !routeParams.cluster) {
-  const match = routePath.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\//);
+if (!routeParams.resource || !routeParams.id || !routeParams.cluster || !routeParams.namespace) {
+  // Parse path: /dashboard/c/:cluster/explorer/:resource/:namespace/:id
+  const match = routePath.match(/\/dashboard\/c\/(.*?)\/explorer\/(.*?)\/(.*?)\/(.*?)(?:\/|$)/);
   if (match) {
     routeParams.cluster = match[1];
     routeParams.resource = match[2];
-    routeParams.id = match[3];
+    routeParams.namespace = match[3];
+    routeParams.id = match[4];
   }
 }
 
